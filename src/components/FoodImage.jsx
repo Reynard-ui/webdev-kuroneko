@@ -19,9 +19,15 @@ const CATEGORY_THEMES = {
   Other: { bg: 'var(--charcoal)', steam: false },
 }
 
-// Photos are real paths or URLs; placeholders are short emoji strings.
+// Photos are paths or URLs (absolute or relative to the site base, e.g.
+// "dishes/tonkotsu-ramen.jpg"); placeholders are short emoji strings.
+// Anything containing a slash or starting with http is a photo — emoji and
+// short placeholders never do.
 function isPhoto(image) {
-  return typeof image === 'string' && (image.startsWith('/') || image.startsWith('http'))
+  return (
+    typeof image === 'string' &&
+    (image.startsWith('http') || image.startsWith('/') || image.includes('/'))
+  )
 }
 
 export default function FoodImage({ image = '🍽️', category = '', size = 120, className = '', fill = false, onOpenPhoto }) {
