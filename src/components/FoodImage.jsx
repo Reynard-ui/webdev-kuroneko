@@ -1,6 +1,6 @@
 // A decorative "plate" for a food item. `food.image` is either a photo
-// path/URL (seeded dishes, e.g. "/dishes/tonkotsu-ramen.jpg") or an emoji
-// (admin-added dishes without a photo). Photos fill the plate as a
+// path/URL (seeded dishes, e.g. "dishes/tonkotsu-ramen.jpg", relative to
+// the site base) or an emoji (admin-added dishes without a photo). Photos fill the plate as a
 // cover-fitted <img>; emojis stay on the charcoal plate with the steam.
 //
 // Strict tri-color system: the plate is exactly the charcoal brand color

@@ -1,7 +1,8 @@
 // Hardcoded food menu. This is the single source of truth for the menu.
 // Later this can be replaced by fetching food items from a backend/database.
 //
-// `image` holds the path to the dish photo (public/dishes/...), so Vite
+// `image` holds the path to the dish photo (public/dishes/..., relative to
+// the site base set in vite.config.js / the <base> tag in index.html).
 // serves it from the project root in dev and copies it into dist/ on build.
 // Admin-added dishes that have no photo keep an emoji placeholder.
 const foods = [
@@ -11,7 +12,7 @@ const foods = [
     category: 'Sushi',
     price: 85000,
     description: 'Eight pieces of fresh salmon nigiri with seasoned sushi rice and nori.',
-    image: '/dishes/salmon-nigiri.jpg',
+    image: 'dishes/salmon-nigiri.jpg',
     available: true,
   },
   {
@@ -20,7 +21,7 @@ const foods = [
     category: 'Sushi',
     price: 60000,
     description: 'Hand-rolled nori cone stuffed with crispy ebi shrimp, avocado, and cucumber.',
-    image: '/dishes/ebi-temaki.jpg',
+    image: 'dishes/ebi-temaki.jpg',
     available: true,
   },
   {
@@ -29,7 +30,7 @@ const foods = [
     category: 'Ramen',
     price: 55000,
     description: 'Rich pork-bone broth with chashu, soft-boiled egg, and ramen noodles.',
-    image: '/dishes/tonkotsu-ramen.jpg',
+    image: 'dishes/tonkotsu-ramen.jpg',
     available: true,
   },
   {
@@ -38,7 +39,7 @@ const foods = [
     category: 'Ramen',
     price: 48000,
     description: 'Clear soy broth with chicken shoyu, nori, and bamboo shoots.',
-    image: '/dishes/shoyu-ramen.jpg',
+    image: 'dishes/shoyu-ramen.jpg',
     available: true,
   },
   {
@@ -47,7 +48,7 @@ const foods = [
     category: 'Sashimi',
     price: 95000,
     description: 'Sliced salmon and tuna platter, served with daikon, shiso, and wasabi.',
-    image: '/dishes/sashimi.jpg',
+    image: 'dishes/sashimi.jpg',
     available: false, // sold out for today
   },
   {
@@ -56,7 +57,7 @@ const foods = [
     category: 'Drinks',
     price: 35000,
     description: 'Ceremonial-grade matcha whisked into oat milk, lightly sweetened.',
-    image: '/dishes/matcha-latte.jpg',
+    image: 'dishes/matcha-latte.jpg',
     available: true,
   },
   {
@@ -65,7 +66,7 @@ const foods = [
     category: 'Drinks',
     price: 30000,
     description: 'Roasted hojicha tea poured over milk and plenty of ice.',
-    image: '/dishes/hojicha-latte.jpg',
+    image: 'dishes/hojicha-latte.jpg',
     available: true,
   },
   {
@@ -74,7 +75,7 @@ const foods = [
     category: 'Side Dishes',
     price: 30000,
     description: 'Pan-seared gyoza with a garlicky soy-vinegar dipping sauce.',
-    image: '/dishes/gyoza.jpg',
+    image: 'dishes/gyoza.jpg',
     available: true,
   },
   {
@@ -83,7 +84,7 @@ const foods = [
     category: 'Side Dishes',
     price: 38000,
     description: 'Crispy soy-marinated fried chicken, finished with sea salt.',
-    image: '/dishes/karaage.jpg',
+    image: 'dishes/karaage.jpg',
     available: true,
   },
 ]
