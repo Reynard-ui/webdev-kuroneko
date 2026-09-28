@@ -1,0 +1,7 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// Simple Vite setup. No alias or extra plugins needed for this base version.
+export default defineConfig({
+  plugins: [react()],
+})

@@ -1,0 +1,1917 @@
+/* ============================================================
+   KURO NEKO (黒猫) — design system
+   Vintage Japanese print/poster look: cream paper, charcoal
+   panels, vermillion accents, hanko seal badges, cherry-blossom
+   linework, red geometric confetti. Two interfaces: a
+   customer-facing editorial site + a practical kitchen back
+   office, sharing one nav + token set.
+   ============================================================ */
+
+:root {
+  /* KURO NEKO palette — strict tri-color system. The whole site uses ONLY
+     these three colors: charcoal #26262b, cream #f5eee1, vermillion #c0392b.
+     Every "soft/dim/faint" token below is one of those three colors with
+     an alpha channel — no other hue, no lighter/darker shade is ever
+     introduced. */
+  --cream: #f5eee1;          /* main paper background */
+  --cream-2: #f5eee1;       /* (kept for old refs — same cream, no tint) */
+  --charcoal: #26262b;      /* nav bars, dark cards, footer */
+  --charcoal-2: #26262b;   /* (kept for old refs — same charcoal) */
+  --charcoal-soft: #26262b;
+  --ink: #26262b;
+  --ink-soft: rgba(38, 38, 43, 0.72);
+  --muted: rgba(38, 38, 43, 0.5);
+  --paper: #f5eee1;        /* card surface = the same cream */
+  --card: #f5eee1;
+  --card-dark: #26262b;
+  --border: rgba(38, 38, 43, 0.18);
+  --border-dark: rgba(245, 238, 225, 0.22);
+
+  --vermillion: #c0392b;  /* CTAs, ribbons, seals */
+  --vermillion-dark: #26262b; /* "darker red" states = charcoal */
+  --vermillion-soft: rgba(192, 57, 43, 0.12);
+  --vermillion-faint: rgba(192, 57, 43, 0.08);
+  --offwhite: #f5eee1;    /* text on dark surfaces (the cream itself) */
+  --offwhite-dim: rgba(245, 238, 225, 0.6);
+
+  /* Semantic states stay monochrome; vermillion carries attention. */
+  --green: rgba(38, 38, 43, 0.72);
+  --green-soft: rgba(38, 38, 43, 0.08);
+  --gold: rgba(38, 38, 43, 0.55);
+  --blue: rgba(38, 38, 43, 0.72);
+  --blue-soft: rgba(38, 38, 43, 0.08);
+
+  /* Type: bold Japanese display for accent words, clean sans body */
+  --font-display: 'Noto Serif JP', 'Hiragino Mincho ProN', Georgia, serif;
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-jp: 'Noto Serif JP', 'Hiragino Mincho ProN', serif;
+  --font-jp-sans: 'Noto Sans JP', 'Hiragino Sans', sans-serif;
+
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 2px 18px rgba(38, 38, 43, 0.08);
+  --shadow-lg: 0 14px 44px rgba(38, 38, 43, 0.16);
+  --shadow-offset: 4px 4px 0 rgba(38, 38, 43, 0.9); /* hard retro poster shadow */
+
+  --maxw: 1120px;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+/* The hero spans 100vw (full-bleed); the vertical scrollbar is inside 100vw,
+   so clip any residual horizontal overflow to keep the edge-to-edge look.
+   NOTE: only on <html> — putting overflow-x on <body> turns body into a
+   scroll container, which silently disables the navbar's position: sticky
+   (it stops pinning to the viewport and gets left behind in document
+   flow). html alone still clips the hero's horizontal overflow. */
+html { overflow-x: hidden; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.15;
+  margin: 0;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+a { color: var(--vermillion); text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+img { max-width: 100%; display: block; }
+
+/* ---------- Motifs ---------- */
+/* Small red uppercase eyebrow line with a letter-spaced kanji marker. */
+.kanji-eyebrow {
+  font-family: var(--font-jp-sans);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  color: var(--vermillion);
+  text-transform: none;
+}
+
+/* Large faint kanji watermark (section kickers). */
+.kanji-mark {
+  font-family: var(--font-jp);
+  font-weight: 900;
+  line-height: 0.86;
+  color: var(--ink);
+}
+
+.red-rule {
+  height: 3px;
+  width: 64px;
+  background: var(--vermillion);
+  border-radius: 2px;
+  margin: 10px 0 0;
+}
+
+/* Decorative cherry-blossom branch linework. Rendered as an absolutely
+   positioned SVG in section corners; low opacity, never interactive. */
+.blossom {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+.blossom.tl { top: 0; left: 0; }
+.blossom.tr { top: 0; right: 0; transform: scaleX(-1); }
+.blossom.bl { bottom: 0; left: 0; transform: scaleY(-1); }
+.blossom.br { bottom: 0; right: 0; transform: scale(-1); }
+.blossom.on-dark { opacity: 0.22; }
+
+/* Overlapping semi-transparent vermillion confetti squares. */
+.confetti-sq {
+  position: absolute;
+  background: var(--vermillion);
+  opacity: 0.14;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---------- Circular hanko seals (Seal.jsx) ---------- */
+.seal {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.seal-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2.5px solid;
+  opacity: 0.9;
+}
+.seal-ring-dashed { border-style: dashed; }
+.seal-char {
+  font-family: var(--font-jp);
+  font-weight: 900;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+  transform: rotate(-4deg);
+}
+.seal { font-size: 0.42em; }
+.seal-red { background: rgba(192, 57, 43, 0.08); }
+.seal-red .seal-char { color: var(--vermillion); }
+.seal-ink { background: rgba(38, 38, 43, 0.06); }
+.seal-ink .seal-char { color: var(--ink); }
+
+/* ---------- Japanese section band (editorial eyebrow + title) ---------- */
+.section-band {
+  position: relative;
+  margin: 54px 0 26px;
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.section-band .kanji-eyebrow { display: block; margin-bottom: 6px; }
+.section-band h2 { font-size: 30px; font-weight: 900; }
+.section-band .band-kicker {
+  font-family: var(--font-jp);
+  font-weight: 900;
+  font-size: 64px;
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 2px rgba(192, 57, 43, 0.28);
+  margin-left: auto;
+  user-select: none;
+}
+
+/* ---------- Layout ---------- */
+.container {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.page { padding: 40px 0 72px; }
+
+.container-wide {
+  width: 100%;
+  max-width: none;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+@media (max-width: 640px) {
+  .container-wide { padding: 0 16px; }
+}
+
+.menu-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+/* The toolbar aligns to flex-start, so the Add-dish button floats up to the
+   eyebrow line. Nudge it 30px down to sit with the "Menu management" title. */
+.menu-toolbar .btn { margin-top: 30px; }
+
+.section-title { font-size: 26px; margin-bottom: 4px; }
+.section-sub { color: var(--muted); margin: 0 0 20px; }
+.muted { color: var(--muted); }
+.small { font-size: 13px; }
+
+/* ---------- Buttons ----------
+   Retro-poster blocks: letter-spaced caps, hard offset shadow.
+   Pill variants (btn-pill) for hero-style outlined calls. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  padding: 12px 22px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-offset);
+  transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.08s, box-shadow 0.08s;
+}
+.btn:active { transform: translateY(2px); box-shadow: 2px 2px 0 rgba(38, 38, 43, 0.9); }
+.btn-primary { background: var(--vermillion); color: var(--offwhite); }
+.btn-primary:hover { background: var(--vermillion-dark); }
+.btn-primary:disabled { background: var(--cream); color: var(--muted); cursor: not-allowed; }
+.btn-outline { background: transparent; border-color: var(--ink); color: var(--ink); box-shadow: none; }
+.btn-outline:hover { background: var(--ink); color: var(--cream); }
+.btn-ghost { background: var(--vermillion-soft); color: var(--vermillion-dark); border-color: transparent; }
+.btn-ghost:hover { background: var(--vermillion); color: var(--offwhite); }
+.btn-dark { background: var(--charcoal); color: var(--cream); }
+.btn-dark:hover { background: var(--vermillion); color: var(--offwhite); }
+.btn-sm { padding: 8px 14px; font-size: 12px; box-shadow: none; }
+.btn-block { width: 100%; }
+/* Pill-shaped outlined buttons (hero, contact). */
+.btn-pill {
+  border-radius: 999px;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  padding: 11px 26px;
+  box-shadow: 3px 3px 0 rgba(38, 38, 43, 0.18);
+}
+.btn-pill:hover { background: var(--ink); color: var(--cream); }
+.btn-pill.red { border-color: var(--vermillion); color: var(--vermillion); box-shadow: 3px 3px 0 rgba(192, 57, 43, 0.25); }
+.btn-pill.red:hover { background: var(--vermillion); color: var(--offwhite); }
+
+/* Pill inputs (contact / checkout forms). */
+.input-pill {
+  border-radius: 999px;
+  padding: 12px 18px;
+}
+
+/* ---------- Navbar ---------- */
+/* KURO NEKO shared nav: a long rounded charcoal pill. Links sit left of the
+   centered wordmark logo; CTA + account pill sit right. Active item scales
+   up and gets a large cream circular seal badge that pokes above the bar. */
+.navbar {
+  position: sticky;
+  top: 44px;
+  z-index: 50;
+  background: var(--charcoal);
+  border: 1px solid rgba(245, 238, 225, 0.12);
+  border-radius: 999px;
+  box-shadow: 0 14px 40px rgba(38, 38, 43, 0.35);
+  /* Sit the bar down enough for the active seal circle to clear the top
+     of the viewport, and inset it 48px from each screen edge so the
+     pill never touches the sides. */
+  width: calc(100% - 96px);
+  margin: 44px auto 0;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+/* Auto-hide: slides up out of view when scrolling down; back on scroll up. */
+.navbar-hidden {
+  transform: translateY(calc(-100% - 24px));
+}
+@media (prefers-reduced-motion: reduce) {
+  .navbar { transition: none; }
+}
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Taller pill: extra vertical padding so the rounded bar has more
+     breathing room around the links and controls. */
+  padding: 12px 18px;
+}
+/* Layout: brand mark pinned far left, the nav links group centered in
+   the middle, cart/account pinned right. The two flexing side zones keep
+   the link group optically centered; everything sits side-by-side. */
+.nav-links, .nav-right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+/* Client: the five links sit together as one cluster in the middle of the
+   pill — the brand zone on the left and the controls zone on the right flex
+   equally, so the group lands dead-center (same trick as the admin nav). */
+.nav-links { justify-content: center; gap: 8px; }
+/* Admin: the three links stay grouped together — and the brand zone on the
+   left flexes the same as the controls zone on the right, so the group
+   sits dead-center in the pill (the brand content still hugs the far
+   left because it is first in the row). */
+.navbar-admin .nav-links { justify-content: center; gap: 8px; }
+.navbar-admin .nav-brand { flex: 1; min-width: 0; }
+.navbar-admin .nav-right { flex: 1; }
+.nav-right { justify-content: flex-end; }
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* Brand zone flexes to match the controls zone, keeping the link
+     cluster centered on both the client and admin navbars. */
+  flex: 1;
+  min-width: 0;
+  cursor: pointer;
+  user-select: none;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+/* The hanko brand mark (Logo.jsx SVG). */
+.brand-logo-seal {
+  display: inline-block;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(192, 57, 43, 0.45);
+  flex-shrink: 0;
+}
+/* Initial avatar (profile pages) — hanko-styled. */
+.brand-logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  background: var(--card);
+  border: 2px solid var(--vermillion);
+  display: grid;
+  place-items: center;
+  font-size: 22px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+}
+/* KURO NEKO wordmark stack next to the hanko mark. */
+.brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+.brand-name { font-family: var(--font-display); font-size: 16px; font-weight: 900; color: var(--offwhite); letter-spacing: 0.12em; }
+.brand-kanji { font-family: var(--font-jp); font-size: 11px; font-weight: 700; color: var(--vermillion); letter-spacing: 0.22em; }
+.brand-tag { font-size: 10px; color: var(--offwhite-dim); letter-spacing: 0.14em; text-transform: uppercase; }
+
+.nav-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--offwhite-dim);
+  white-space: nowrap;
+  z-index: 1;
+  transition: color 0.2s, font-size 0.25s, font-weight 0.25s,
+    margin 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Hover: a thin vermillion underline slides in left-to-right. */
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 3px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--vermillion);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.25s ease;
+}
+.nav-link:hover { color: var(--offwhite); }
+.nav-link:hover::after { transform: scaleX(1); }
+/* Active: label enlarges; a two-layer cream CIRCLE seal badge (dashed
+   vermillion ring + concentric charcoal ring behind it) rises behind it,
+   like a wax-seal stamp. Both layers are true circles, never stretched
+   ovals: the cream diameter is set per label via --active-d (measured live
+   in Navbar.jsx from the link's own width), so short labels get a small
+   seal and wide ones a bigger one; the charcoal ring is a solid
+   box-shadow spread on the SAME ::before, so it scales and fades as one
+   unit with the cream circle. The active link also gains side margins so
+   the unselected neighbours shift away smoothly. */
+/* The badge lives on every link (hidden by default) so it fades both in and
+   out; width/height follow --active-d instantly (no transition — a resize
+   observer drives it during the label's font-size transition). */
+.nav-link::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--active-d, 96px);
+  height: var(--active-d, 96px);
+  transform: translate(-50%, -50%) scale(0.6);
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2.5px dashed var(--vermillion);
+  /* Second layer: a concentric charcoal ring (same tone as the navbar,
+     NOT flat black) peeking ~8px past the cream edge, like the shadow
+     ring of a wax-seal stamp. A solid box-shadow spread on the
+     border-radius:50% element forms a perfect concentric circle, so it
+     stays centered and scales/fades with the cream circle as one unit.
+     A soft neutral drop shadow follows for depth. */
+  box-shadow: 0 0 0 8px var(--charcoal),
+    0 12px 26px rgba(38, 38, 43, 0.4);
+  z-index: -1;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.2s ease;
+}
+.nav-link.active {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 700;
+  z-index: 5;
+  /* Push the unselected neighbours away from the badge, smoothly. */
+  margin-left: 8px;
+  margin-right: 8px;
+}
+.nav-link.active::before { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+/* Client-only: thicken the charcoal ring layer around the active badge
+   (8px spread -> 12px). The cream circle itself is untouched; admin keeps
+   the base 8px rule (its badge is suppressed anyway). */
+.navbar:not(.navbar-admin) .nav-link.active::before {
+  box-shadow: 0 0 0 12px var(--charcoal),
+    0 12px 26px rgba(38, 38, 43, 0.4);
+}
+/* Admin nav — no circular seal. The active item simply shows the same
+   vermillion underline as hover (below the label) and keeps the light
+   offwhite text so it reads on the charcoal bar. The cream/charcoal
+   two-layer circle badge is suppressed here (and its neighbour margins
+   stay), so only clients get the medallion look. */
+.navbar-admin .nav-link.active::before { opacity: 0; }
+.navbar-admin .nav-link.active { color: var(--offwhite); }
+.navbar-admin .nav-link.active::after {
+  display: block;
+  transform: scaleX(1);
+}
+/* The home page's About / Contact are on-page sections (the navbar's About
+   and Contact links auto-scroll to them). scroll-margin-top keeps their
+   headings from hiding behind the pinned navbar (44px offset + ~68px bar
+   + a little breathing room). */
+#client-about,
+#client-contact {
+  scroll-margin-top: 128px;
+}
+.nav-link.active::after { display: none; }
+.cart-badge {
+  background: var(--vermillion);
+  color: var(--offwhite);
+  font-size: 11px;
+  font-weight: 700;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  display: inline-grid;
+  place-items: center;
+  margin-left: 4px;
+}
+.nav-link.active .cart-badge { background: var(--vermillion); color: var(--offwhite); }
+
+/* Red CTA pill — right-side call-to-action. */
+.nav-checkout {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--offwhite);
+  background: var(--vermillion);
+  border: none;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(192, 57, 43, 0.35);
+  transition: background 0.15s, transform 0.15s;
+}
+.nav-checkout:hover { background: var(--vermillion-dark); transform: translateY(-1px); }
+.nav-checkout .cart-badge { background: var(--offwhite); color: var(--vermillion); }
+/* The cart symbol sits in place of the old "Cart" label; center the icon
+   and keep the count badge beside it. */
+.nav-checkout { display: inline-flex; align-items: center; }
+.nav-cart-icon { display: block; flex-shrink: 0; }
+.nav-user { display: flex; align-items: center; gap: 4px; }
+.role-pill {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--offwhite);
+  background: rgba(245, 238, 225, 0.08);
+  border: 1px solid rgba(245, 238, 225, 0.16);
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.role-pill:hover { background: rgba(245, 238, 225, 0.16); }
+.role-pill.active { background: var(--vermillion); border-color: var(--vermillion); }
+.pill-chev { font-size: 10px; line-height: 1; transition: transform 0.15s; }
+.pill-chev.up { transform: rotate(180deg); }
+
+/* Account dropdown under the name pill. */
+.nav-user { position: relative; }
+.account-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 60;
+  min-width: 150px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px;
+  display: grid;
+  gap: 2px;
+}
+.account-item {
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+}
+.account-item:hover { background: var(--vermillion-soft); color: var(--vermillion-dark); }
+
+@media (max-width: 860px) {
+  /* Keep the mobile pill at its usual 16px side insets — the desktop 48px
+     inset would make it too narrow to fit the rows comfortably. */
+  .navbar { top: 32px; margin: 32px auto 0; width: calc(100% - 32px); }
+  .navbar-inner {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    row-gap: 8px;
+  }
+  /* Brand on top, links + controls stack below, each centered. */
+  .nav-brand { order: 1; width: 100%; justify-content: center; }
+  .nav-links { order: 2; width: 100%; justify-content: center; flex-wrap: wrap; row-gap: 2px; }
+  .nav-right { order: 3; width: 100%; justify-content: center; }
+  .nav-link { padding: 8px 12px; font-size: 12px; }
+}
+
+/* ---------- Hero (client home) — KURO NEKO vintage poster ----------
+   Two columns: eyebrow + copy + pill buttons (left) and oversized kanji
+   display with a big bleeding red circle (right). Full-bleed: it breaks
+   out of the 1120px container to span the whole viewport edge-to-edge
+   (borderless — no card, no shadow, no rounded corners). */
+.hero {
+  position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--cream);
+  overflow: hidden;
+  padding: 80px 96px;
+}
+/* big solid red circle bleeding off the right edge */
+.hero-red-circle {
+  position: absolute;
+  right: -180px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: var(--vermillion);
+  z-index: 0;
+}
+.hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 44px;
+  align-items: center;
+}
+.hero-text { position: relative; }
+.hero-label {
+  font-size: 14px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--vermillion);
+  margin-bottom: 16px;
+  display: inline-block;
+  border-bottom: 3px solid var(--vermillion);
+  padding-bottom: 7px;
+}
+.hero h1 { font-size: 64px; font-weight: 900; margin-bottom: 16px; font-family: var(--font-display); }
+.hero p { color: var(--ink-soft); max-width: 560px; font-size: 19px; margin: 0 0 30px; }
+.hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+/* The hero's two pill calls get a bigger footprint than the base btn-pill. */
+.hero .btn-pill { padding: 17px 42px; font-size: 16px; }
+
+/* Right column: oversized kanji display in a dashed circular frame. */
+.hero-display {
+  text-align: center;
+  position: relative;
+}
+.hero-display .hero-kanji {
+  font-size: 168px;
+  line-height: 0.9;
+  font-weight: 900;
+  color: var(--ink);
+  font-family: var(--font-jp);
+  display: block;
+  text-shadow: 5px 5px 0 rgba(192, 57, 43, 0.2);
+}
+.hero-subtitle {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink);
+  margin-top: 14px;
+}
+/* dashed circular frame around the kanji block (echoes the reference's
+   dashed photo frames) with a small Kuro mark worked into the graphic. */
+.hero-display-frame {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto;
+  padding: 44px 62px 96px;
+  border: 2.5px dashed rgba(38, 38, 43, 0.35);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+}
+.hero-cat { position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%) scale(1.15); z-index: 2; }
+.hero-plaque {
+  position: absolute;
+  top: -14px;
+  right: 18%;
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  background: var(--vermillion);
+  color: var(--offwhite);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  padding: 11px 8px;
+  border-radius: 3px;
+  box-shadow: 3px 3px 0 var(--charcoal);
+}
+.hero-plaque span:first-child { font-size: 16px; display: block; }
+@media (max-width: 900px) {
+  .hero { padding: 44px 24px; }
+  .hero-grid { grid-template-columns: 1fr; gap: 28px; }
+  .hero h1 { font-size: 44px; }
+  .hero p { font-size: 16px; }
+  .hero .btn-pill { padding: 13px 28px; font-size: 14px; }
+  .hero-red-circle { width: 300px; height: 300px; right: -130px; }
+  .hero-display-frame { padding: 26px 40px 96px; }
+  .hero-cat { transform: translateX(-50%) scale(0.95); bottom: -14px; }
+  .hero-display .hero-kanji { font-size: 96px; }
+}
+
+/* ---------- Category filter bar ----------
+   Dark full-width rounded capsule: category tabs arranged horizontally,
+   a small circular logo medallion centered in the bar, active tab in
+   vermillion. Wired to the existing category-filter logic (chips class). */
+.chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin: 22px 0 8px;
+  background: var(--charcoal);
+  border-radius: 999px;
+  padding: 6px;
+  width: fit-content;
+  position: relative;
+}
+/* small circular logo badge centered in the capsule bar */
+.chips-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--vermillion);
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.25);
+  flex-shrink: 0;
+  order: 0;
+}
+.chips-badge svg { width: 18px; height: 18px; }
+.chip {
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--offwhite-dim);
+}
+.chip:hover { color: var(--offwhite); }
+.chip.active { background: var(--vermillion); color: var(--offwhite); font-weight: 700; }
+.chip .chip-kanji {
+  font-family: var(--font-jp);
+  color: var(--offwhite-dim);
+  margin-right: 6px;
+}
+.chip.active .chip-kanji { color: var(--offwhite); }
+
+/* ---------- Cards / grid ---------- */
+.grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* KURO NEKO menu cards: charcoal body, circular photo on top, small red
+   circular add-badge on the photo corner, dashed-border inset box for
+   name + description, vermillion price ribbon at the card bottom.
+   One-piece look: no outer border or hard shadow — the dark surface
+   against the cream page provides all the separation. */
+.food-card {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: var(--card-dark);
+  border-radius: var(--radius);
+}
+.food-card .food-plate {
+  border-bottom: none;
+  border-radius: 0 0 50% 50% / 0 0 18px 18px;
+}
+.food-card .food-name { color: var(--offwhite); }
+.food-card .food-desc { color: var(--offwhite-dim); }
+.food-card .food-cat { color: var(--offwhite-dim); }
+.food-body {
+  padding: 16px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+/* dashed-border inset box for name + short description */
+.food-card .food-info {
+  border: 1.5px dashed rgba(245, 238, 225, 0.28);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+}
+.food-name { font-size: 16px; font-weight: 700; font-family: var(--font-display); }
+.food-desc { font-size: 13px; color: var(--muted); flex: 1; }
+.food-meta { display: flex; align-items: center; justify-content: space-between; }
+.food-price { font-weight: 700; color: var(--vermillion); font-size: 15px; }
+/* Outlined price pill: red border, no fill — the card's dark body shows
+   through, and the vermillion outline carries the accent. */
+.food-card .food-price {
+  background: transparent;
+  color: var(--offwhite);
+  border: 1.5px solid var(--vermillion);
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+}
+.food-cat { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); display: inline-flex; align-items: center; }
+
+.soldout-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  background: var(--charcoal);
+  color: var(--cream);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.food-card.is-out .food-plate { filter: grayscale(0.6); opacity: 0.65; }
+
+/* Red circular add-to-cart badge, sitting in the card's bottom ribbon
+   (next to the price) instead of floating over the photo. */
+.card-add {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 2px solid var(--charcoal);
+  background: var(--vermillion);
+  color: var(--offwhite);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.card-add:hover { background: var(--vermillion-dark); transform: scale(1.08); }
+.card-add:active { transform: scale(0.96); }
+.card-add.has-qty { font-size: 14px; }
+
+/* Menu page only: uniform item boxes. Dish copy varies (long names, long
+   descriptions), so card heights used to differ row to row. On the menu
+   page every card reserves exactly the same space: a two-line name slot and
+   a three-line description slot, clamped so longer copy can't overflow.
+   (Scoped to .menu-page-grid so the home "popular dishes" grid keeps its
+   natural, content-sized cards.) */
+.menu-page-grid .food-card .food-name,
+.admin-menu-grid .food-card .food-name {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 37px; /* two lines of the 16px display font (1.15 leading) */
+}
+.menu-page-grid .food-card .food-desc,
+.admin-menu-grid .food-card .food-desc {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 60px; /* three lines of the 13px body font (1.55 leading) */
+}
+/* Stretch each card to its reveal wrapper so a row's height is shared, not
+   driven by the tallest card's content. */
+.menu-page-grid .food-card,
+.admin-menu-grid .food-card { height: 100%; }
+
+/* Admin menu only: drop the decorative per-category overlays on the
+   photos — the rising steam wisps on hot dishes and the drifting ice
+   cubes on drinks. They read as a gimmick behind real food photos in
+   the admin view; scoped to .admin-menu-grid so the client menu page and
+   the home "popular dishes" grid keep their steam/ice. */
+.admin-menu-grid .food-steam,
+.admin-menu-grid .food-ice {
+  display: none;
+}
+
+/* Client menu page only: the same steam/ice overlays hidden there, so no
+   dish on /menu shows the rising-smoke or drifting-ice animation. */
+.menu-page-grid .food-steam,
+.menu-page-grid .food-ice {
+  display: none;
+}
+
+/* Home "Popular today" grid: no steam/ice overlays either, so the photos
+   read clean. Matches the .menu-page-grid treatment above. */
+.popular-grid .food-steam,
+.popular-grid .food-ice {
+  display: none;
+}
+
+/* Admin Remove button (in the card ribbon): identical shape to the price
+   pill — transparent fill, 1.5px vermillion outline, full pill rounding,
+   same padding and type size — so the two read as a matched pair. */
+.card-remove {
+  flex-shrink: 0;
+  background: transparent;
+  color: var(--offwhite);
+  border: 1.5px solid var(--vermillion);
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* Admin only: small circular pencil icon, top-RIGHT corner of the card. */
+.card-edit {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1.5px solid var(--charcoal);
+  background: var(--paper);
+  color: var(--ink-soft);
+  display: grid;
+  place-items: center;
+  box-shadow: 2px 2px 0 var(--charcoal);
+  transition: color 0.15s, border-color 0.15s, transform 0.05s;
+}
+.card-edit:hover { color: var(--vermillion-dark); border-color: var(--vermillion); }
+.card-edit:active { transform: scale(0.94); }
+
+/* ---------- Features strip ----------
+   Full-width rounded pill bar: icon + label pairs. Now transparent with a
+   red outline (was a solid charcoal bar), so it reads as an outlined badge
+   on the cream page; labels use charcoal for legibility. Static/decorative. */
+.features-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: transparent;
+  border: 1.5px solid var(--vermillion);
+  border-radius: 999px;
+  padding: 18px 30px;
+  margin: 34px 0 8px;
+  position: relative;
+  overflow: hidden;
+}
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.feature-item .feature-seal {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--vermillion-faint);
+  border: 1.5px dashed var(--vermillion);
+  color: var(--vermillion);
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+/* ---------- Order status stamps (hanko treatment) ----------
+   Status indicators rendered as circular Japanese stamp badges instead of
+   plain gray pills: dashed red ring + status kanji + small label. */
+.status-stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 14px 4px 4px;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1.5px solid var(--border);
+}
+.status-stamp .stamp-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-jp);
+  font-weight: 900;
+  font-size: 13px;
+  border: 2px solid;
+  transform: rotate(-6deg);
+}
+.status-stamp .stamp-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+/* per-status tints (stamp ring + text) — tri-color only */
+.status-stamp.pending .stamp-circle { border-color: var(--muted); color: var(--muted); background: rgba(38, 38, 43, 0.06); }
+.status-stamp.pending .stamp-label { color: var(--muted); }
+.status-stamp.confirmed .stamp-circle { border-color: var(--vermillion); color: var(--vermillion); background: var(--vermillion-soft); }
+.status-stamp.confirmed .stamp-label { color: var(--vermillion-dark); }
+.status-stamp.preparing .stamp-circle { border-color: var(--vermillion); color: var(--vermillion); background: var(--vermillion-faint); }
+.status-stamp.preparing .stamp-label { color: var(--vermillion-dark); }
+.status-stamp.ready .stamp-circle { border-color: var(--charcoal); color: var(--charcoal); background: rgba(38, 38, 43, 0.08); }
+.status-stamp.ready .stamp-label { color: var(--charcoal); }
+.status-stamp.completed .stamp-circle { border-color: var(--ink-soft); color: var(--ink-soft); background: var(--green-soft); }
+.status-stamp.completed .stamp-label { color: var(--ink-soft); }
+/* fallback for the plain .status pill class used in admin order cards */
+.status {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  border: 1.5px dashed transparent;
+}
+.status-pending   { background: rgba(38, 38, 43, 0.06); color: var(--muted); border-color: var(--border); }
+.status-confirmed { background: var(--vermillion-soft); color: var(--vermillion-dark); border-color: var(--vermillion); }
+.status-preparing { background: var(--vermillion-faint); color: var(--vermillion-dark); border-color: var(--vermillion); }
+.status-ready     { background: rgba(38, 38, 43, 0.08); color: var(--charcoal); border-color: var(--charcoal); }
+.status-completed { background: var(--green-soft); color: var(--ink-soft); border-color: var(--border); }
+
+/* ---------- Orders list ---------- */
+.order-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px;
+  position: relative;
+}
+.order-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+/* Admin order card only: the "customer + status" header row (name + circular
+   seal) sits directly above the "MENU"/"TOTAL" body. Nudge the body down 10px
+   so the name doesn't crowd the menu section. Scoped to .admin-card so the
+   client's order views keep their tighter layout. */
+.admin-card .order-head { margin-bottom: 10px; }
+.order-items { margin: 12px 0; }
+.order-item { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; color: var(--ink-soft); }
+.order-totals { border-top: none; margin-top: 10px; padding-top: 10px; }
+.order-total-row { display: flex; justify-content: space-between; font-weight: 700; font-size: 15px; }
+/* Wide-and-low body: two clearly separated blocks. Both columns take half
+   the panel so the TOTAL section starts at the middle. The dish rows stay
+   capped at 244px so a dish's name and its price keep their tight gap
+   even though the menu column itself is now half-width. One column
+   again on phones. */
+.order-body { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+.order-menu, .order-total, .order-status { display: grid; gap: 12px; align-content: start; }
+.order-menu .order-items { margin: 0; }
+.order-menu .order-item { max-width: 244px; }
+.order-total .order-totals { margin: 0; padding: 0; }
+/* Small section label that splits the panel into "menu" and "total." */
+.order-block-label { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 800; letter-spacing: .18em; text-transform: uppercase; color: var(--vermillion); }
+.order-block-label::after { content: ""; height: 1px; flex: 1; background: rgba(245, 238, 225, .18); }
+@media (max-width: 820px) {
+  .order-body { grid-template-columns: 1fr; gap: 22px; }
+}
+
+/* Per-order section: a solid charcoal panel so each order reads as its own
+   block (client "My Orders" + home "Your active order"). The card inside goes
+   transparent and text flips to cream for contrast. Admin orders stay cream. */
+.order-section {
+  background: var(--charcoal);
+  color: var(--offwhite);
+  border-radius: var(--radius);
+  padding: 40px 48px;
+  margin-bottom: 18px;
+  position: relative;
+}
+/* Lift the status badge up into the header row, vertically centered on the
+   "Order #X" number line (注文 eyebrow sits above it). Desktop h3 center is
+   ~87px from the panel top: the 40px stamp -> 67px, the 30px pill -> 72px.
+   The client stamp carries a .stamp-label inside it; the admin card's seal
+   does not, so its real status is a separate .status pill. */
+.order-section .status-stamp:has(.stamp-label) { position: absolute; top: 67px; right: 48px; }
+.order-section .order-card .status { position: absolute; top: 74px; right: 48px; }
+.order-section-head {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.order-section-head .kanji-eyebrow { display: block; margin-bottom: 8px; font-size: 14px; color: var(--offwhite-dim); }
+.order-section-head h3 { font-family: var(--font-jp); font-size: 30px; font-weight: 900; margin: 0; color: var(--offwhite); }
+.order-section .order-card { background: transparent; padding: 0; position: static; }
+.order-section .order-card .order-item { color: var(--offwhite-dim); font-size: 15px; padding: 4px 0; }
+.order-section .order-card .order-total-row { font-size: 17px; }
+.order-section .order-card .small { font-size: 14px; }
+.order-section .order-card .muted { color: var(--offwhite-dim); font-size: 14px; }
+.order-section .status-select { font-size: 14px; padding: 6px 14px; }
+/* On narrow phones the panel is already tight; ease the padding so the
+   status control + price column don't get squeezed. */
+@media (max-width: 820px) {
+  .order-section { padding: 28px 24px; }
+  .order-section-head h3 { font-size: 24px; }
+  .order-section-head .kanji-eyebrow { font-size: 12px; }
+  .order-section .order-card .order-item { font-size: 13px; }
+  .order-section .order-card .order-total-row { font-size: 15px; }
+  .order-section .order-card .small,
+  .order-section .order-card .muted { font-size: 13px; }
+  .order-section .status-select { font-size: 13px; padding: 5px 12px; }
+  .order-section .status-stamp:has(.stamp-label) { top: 48px; right: 24px; }
+  .order-section .order-card .status { top: 57px; right: 24px; }
+}
+/* Status chips + stamps inside the dark section: flip the charcoal-text
+   variants to cream so they stay readable on the charcoal panel. */
+.order-section .status { color: var(--offwhite); border-color: var(--border-dark); }
+.order-section .status-pending   { background: rgba(245, 238, 225, 0.10); color: var(--offwhite-dim); border-color: var(--border-dark); }
+.order-section .status-confirmed { background: var(--vermillion-soft); color: var(--offwhite); border-color: var(--vermillion); }
+.order-section .status-preparing { background: var(--vermillion-faint); color: var(--offwhite); border-color: var(--vermillion); }
+.order-section .status-ready     { background: rgba(245, 238, 225, 0.10); color: var(--offwhite); border-color: var(--border-dark); }
+.order-section .status-completed { background: rgba(245, 238, 225, 0.10); color: var(--offwhite-dim); border-color: var(--border-dark); }
+.order-section .status-stamp.pending .stamp-circle,
+.order-section .status-stamp.ready .stamp-circle,
+.order-section .status-stamp.completed .stamp-circle {
+  border-color: var(--offwhite-dim); color: var(--offwhite-dim); background: rgba(245, 238, 225, 0.08);
+}
+
+/* ---------- Story / specialties editorial sections ---------- */
+.story-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 30px;
+  align-items: center;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 36px;
+  position: relative;
+  overflow: hidden;
+}
+.story-copy h3 { font-size: 24px; font-weight: 900; margin-bottom: 10px; font-family: var(--font-jp); }
+.story-copy p { color: var(--ink-soft); margin: 0 0 12px; }
+.story-visual {
+  display: grid;
+  place-items: center;
+  min-height: 200px;
+  position: relative;
+}
+.story-visual .dash-frame {
+  width: 240px;
+  height: 240px;
+  border: 2.5px dashed rgba(38, 38, 43, 0.4);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 1;
+}
+.story-visual .seal { z-index: 2; position: relative; }
+@media (max-width: 820px) {
+  .story-grid { grid-template-columns: 1fr; padding: 26px; }
+}
+
+/* specialties: large editorial panels mixing kanji + copy + plate */
+.specialty-row {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 26px;
+  align-items: center;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 30px 34px;
+  position: relative;
+  overflow: hidden;
+}
+.specialty-row.reverse { grid-template-columns: 1.2fr 1fr; }
+.specialty-row.reverse .specialty-copy { order: 2; }
+.specialty-copy .kanji-eyebrow { display: block; margin-bottom: 8px; }
+.specialty-copy h3 { font-size: 26px; font-weight: 900; font-family: var(--font-jp); margin-bottom: 8px; }
+.specialty-copy p { color: var(--ink-soft); margin: 0; font-size: 14px; }
+.specialty-kanji {
+  position: absolute;
+  font-family: var(--font-jp);
+  font-weight: 900;
+  font-size: 150px;
+  line-height: 0.8;
+  color: rgba(192, 57, 43, 0.07);
+  bottom: -24px;
+  right: 20px;
+  pointer-events: none;
+  user-select: none;
+}
+@media (max-width: 820px) {
+  .specialty-row, .specialty-row.reverse { grid-template-columns: 1fr; }
+}
+
+/* ---------- Branches / find-the-cat section ---------- */
+.branch-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+.branch-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 20px;
+  position: relative;
+}
+.branch-card .branch-kanji {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  font-family: var(--font-jp);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--vermillion);
+  opacity: 0.8;
+}
+.branch-card h4 { font-size: 17px; font-weight: 700; margin-bottom: 6px; font-family: var(--font-display); }
+.branch-card .branch-meta { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+/* ---------- Contact section (split red panel + cream card) ----------
+   One-piece look: the split block itself has no outer border/shadow —
+   the red panel and the cream card sit edge to edge on the page. */
+.contact-split {
+  display: grid;
+  grid-template-columns: 1fr 1.3fr;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.contact-dark {
+  background: var(--vermillion);
+  color: var(--offwhite);
+  padding: 34px 30px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 320px;
+}
+.contact-dark .mountain-line {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  opacity: 0.35;
+}
+.contact-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  font-family: var(--font-jp);
+  font-weight: 900;
+  font-size: 34px;
+  letter-spacing: 0.3em;
+  opacity: 0.9;
+  align-self: flex-start;
+}
+.contact-dark .contact-note { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; }
+.contact-form {
+  background: var(--paper);
+  padding: 34px 34px;
+  position: relative;
+}
+.contact-form h3 { font-size: 22px; font-weight: 900; margin-bottom: 18px; font-family: var(--font-display); }
+@media (max-width: 820px) {
+  .contact-split { grid-template-columns: 1fr; }
+}
+
+/* ---------- Footer (KURO NEKO) ----------
+   Full-width charcoal: logo + blurb left, circular Kuro illustration
+   centered, newsletter with pill input + red circular arrow right. */
+.footer {
+  background: var(--charcoal);
+  padding: 40px 0 0;
+  color: var(--offwhite-dim);
+  font-size: 13px;
+  margin-top: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1.2fr;
+  gap: 30px;
+  align-items: center;
+  padding: 0 24px 28px;
+  max-width: var(--maxw);
+  margin: 0 auto;
+}
+.footer-brand {
+  font-family: var(--font-jp);
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--offwhite);
+  letter-spacing: 0.18em;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.footer-blurb { color: var(--offwhite-dim); max-width: 300px; }
+.footer-circle {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: rgba(245, 238, 225, 0.05);
+  border: 2px dashed rgba(192, 57, 43, 0.5);
+  display: grid;
+  place-items: center;
+  position: relative;
+}
+.footer-newsletter { justify-self: end; width: 100%; max-width: 340px; }
+.footer-newsletter .newsletter-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--offwhite);
+  margin-bottom: 12px;
+}
+.newsletter-row { display: flex; align-items: center; gap: 8px; }
+.newsletter-input {
+  flex: 1;
+  min-width: 0;
+  border: 1.5px solid var(--border-dark);
+  background: rgba(245, 238, 225, 0.06);
+  border-radius: 999px;
+  padding: 11px 18px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--offwhite);
+}
+.newsletter-input::placeholder { color: var(--offwhite-dim); }
+.newsletter-input:focus { outline: none; border-color: var(--vermillion); }
+.newsletter-send {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  background: var(--vermillion);
+  color: var(--offwhite);
+  font-size: 16px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+.newsletter-send:hover { background: var(--vermillion-dark); transform: scale(1.05); }
+.footer-note {
+  text-align: center;
+  padding: 14px 24px;
+  font-size: 12px;
+  color: var(--offwhite-dim);
+  letter-spacing: 0.06em;
+}
+@media (max-width: 820px) {
+  .footer-grid { grid-template-columns: 1fr; text-align: center; }
+  .footer-brand { justify-content: center; }
+  .footer-blurb { margin: 0 auto; }
+  .footer-newsletter { justify-self: center; }
+  .footer-circle { width: 110px; height: 110px; }
+}
+
+/* ---------- Stat panels (admin) ----------
+   Cream panels with vermillion key numbers and a faint kanji watermark.
+   One-piece look: no outer border or hard offset shadow — the cream panel
+   against the cream page reads by its own rounded shape + the corner seal. */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+.stat {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+}
+/* a faint kanji seal watermark in the corner of each stat panel */
+.stat::after {
+  content: attr(data-kanji, "");
+  position: absolute;
+  right: 6px;
+  bottom: -4px;
+  font-family: var(--font-jp);
+  font-size: 46px;
+  font-weight: 900;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(192, 57, 43, 0.2);
+  pointer-events: none;
+}
+.stat-num { font-family: var(--font-display); font-size: 30px; font-weight: 900; color: var(--ink); }
+.stat-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.stat.accent .stat-num { color: var(--vermillion); }
+
+/* ---------- Tables + admin selects ---------- */
+.table-wrap { overflow-x: auto; }
+table.data { width: 100%; border-collapse: collapse; background: var(--card); border-radius: var(--radius); overflow: hidden; }
+table.data th, table.data td { text-align: left; padding: 12px 14px; font-size: 14px; border-bottom: 1px solid var(--border); }
+table.data th { background: var(--cream-2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 700; }
+table.data tr:last-child td { border-bottom: none; }
+select.status-select {
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--card);
+  cursor: pointer;
+}
+select.status-select:focus { outline: 2px solid var(--vermillion-soft); border-color: var(--vermillion); }
+
+/* ---------- Forms ---------- */
+.form-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+.field { margin-bottom: 14px; }
+.field label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.02em; }
+.input, textarea.input {
+  width: 100%;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 13px;
+  font-size: 14px;
+  font-family: inherit;
+  background: var(--cream);
+  color: var(--ink);
+}
+.input:focus { outline: 2px solid var(--vermillion-soft); border-color: var(--vermillion); }
+.hint { font-size: 12px; color: var(--muted); margin-top: 5px; }
+.error-text { color: var(--vermillion-dark); font-size: 13px; font-weight: 500; }
+
+/* radio-like option cards (delivery / pickup) */
+.options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.option {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  cursor: pointer;
+  background: var(--cream);
+}
+.option.active { border-color: var(--vermillion); background: var(--vermillion-soft); }
+.option .opt-title { font-weight: 700; font-size: 15px; }
+.option .opt-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+/* ---------- Empty states / banners ---------- */
+.empty {
+  text-align: center;
+  padding: 44px 20px;
+  color: var(--muted);
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  background: var(--cream);
+}
+/* small Kuro line-art moment in empty states */
+.empty .cat { margin: 0 auto 10px; display: block; }
+.empty .empty-title { font-size: 16px; font-weight: 700; color: var(--ink-soft); }
+.banner {
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  margin: 12px 0;
+}
+.banner.success { background: var(--green-soft); color: var(--green); border: 1.5px dashed var(--ink-soft); }
+.banner.error { background: var(--vermillion-soft); color: var(--vermillion-dark); border: 1.5px dashed var(--vermillion); }
+
+/* ---------- Two column layout (cart + summary) ---------- */
+.split { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; align-items: start; }
+@media (max-width: 820px) {
+  .split { grid-template-columns: 1fr; }
+  .options { grid-template-columns: 1fr; }
+}
+
+/* ---------- Login ---------- */
+.login-wrap { position: relative; overflow: hidden; min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.login-card { width: 100%; max-width: 400px; position: relative; z-index: 1; }
+/* Ink-bordered cream card so it stays readable over the moving background. */
+.login-card {
+  background: var(--card);
+  backdrop-filter: blur(14px) saturate(1.1);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  border: 2px solid var(--ink);
+}
+/* login moving background: drifting warm blobs + dishes rising */
+.login-bg { position: absolute; inset: 0; overflow: hidden; }
+.login-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+  will-change: transform;
+}
+.login-blob-1 {
+  width: 380px; height: 380px;
+  background: var(--vermillion-soft);
+  top: -80px; left: -60px;
+  animation: blob-drift-1 22s ease-in-out infinite alternate;
+}
+.login-blob-2 {
+  width: 320px; height: 320px;
+  background: var(--cream-2);
+  bottom: -90px; right: -50px;
+  animation: blob-drift-2 26s ease-in-out infinite alternate;
+}
+.login-blob-3 {
+  width: 260px; height: 260px;
+  background: rgba(192, 57, 43, 0.22);
+  top: 40%; left: 58%;
+  animation: blob-drift-3 30s ease-in-out infinite alternate;
+}
+@keyframes blob-drift-1 { to { transform: translate(120px, 80px) scale(1.15); } }
+@keyframes blob-drift-2 { to { transform: translate(-110px, -70px) scale(1.2); } }
+@keyframes blob-drift-3 { to { transform: translate(-80px, 90px) scale(0.9); } }
+
+.login-riser {
+  position: absolute;
+  bottom: -60px;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation-name: login-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+@keyframes login-rise {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.8; }
+  50%  { opacity: 0.55; }
+  90%  { opacity: 0.2; }
+  100% { transform: translateY(-110vh) rotate(20deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .login-blob, .login-riser { animation: none; }
+  .login-riser { opacity: 0.3; bottom: 20%; }
+}
+
+/* ---------- Profile (client + admin) ---------- */
+.profile-rows {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+}
+.profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 0;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.profile-row:last-child { border-bottom: none; }
+
+/* ---------- Modal (add-dish popup) ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(38, 38, 43, 0.55);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.modal {
+  width: 100%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: var(--card);
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.modal-head h3 { font-size: 19px; font-weight: 900; font-family: var(--font-display); }
+.modal-close {
+  border: 1.5px solid var(--border);
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--muted);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.modal-close:hover { background: var(--vermillion-soft); color: var(--vermillion-dark); border-color: var(--vermillion); }
+
+/* ---------- Food plates (decorative dish visuals) ---------- */
+/* A per-category plate with a drop-shadowed dish and rising steam,
+   presented like editorial food photography. Circular for menu cards. */
+.food-plate {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+.food-card .food-plate {
+  width: 100%;
+  height: 148px;
+  font-size: 64px;
+  border-radius: 0;
+}
+/* A dish photo filling the plate (seeded menu items). object-fit: cover so
+   it crops to the plate shape with no letterboxing; the plate's own
+   overflow: hidden + border-radius clips the corners. */
+.food-plate-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Menu-card plates: stretch to the full card width; the height is the
+   established .food-card .food-plate value (148px). `fill` drops the
+   inline width/height so this rule wins instead of a fixed 120px square. */
+.food-card .food-plate-fill {
+  cursor: pointer;
+}
+.food-plate-fill .food-plate-img {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.food-card:hover .food-plate-fill .food-plate-img {
+  transform: scale(1.06);
+}
+
+/* ---------- Dish photo popup (lightbox) ---------- */
+/* A dark backdrop fills the screen; the centered box is a FIXED size so
+   every dish's popup is the same size. The photo fits inside with
+   object-fit: contain — it is NEVER stretched, just letterboxed on the
+   charcoal box. Clicking the backdrop (any empty space) or the red ×
+   (top-right of the box) closes it. */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(18, 18, 22, 0.74);
+  animation: lightbox-fade 0.18s ease-out;
+}
+.lightbox-box {
+  position: relative;
+  width: min(440px, 90vw);
+  height: min(440px, 76vh);
+  background: var(--charcoal);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  animation: lightbox-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* contain (not fill/cover): keeps the photo's aspect ratio — no stretch. */
+.lightbox-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+/* Red circular × button pinned to the box's top-right corner. */
+.lightbox-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: var(--vermillion);
+  color: var(--cream);
+  font-size: 20px;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 2;
+}
+.lightbox-close:hover {
+  background: #a82f23;
+}
+@keyframes lightbox-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes lightbox-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to { opacity: 1; transform: scale(1); }
+}
+/* The dish emoji itself, lifted off the plate with a soft shadow. */
+.food-plate-item {
+  display: block;
+  filter: drop-shadow(0 6px 6px rgba(38, 38, 43, 0.4));
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.food-card:hover .food-plate-item {
+  transform: scale(1.12) translateY(-3px);
+}
+/* Rising steam wisps (hot dishes only). Cream so they read on the
+   charcoal plates (strict tri-color: no off-palette white). */
+.food-steam {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.food-steam span {
+  position: absolute;
+  width: 4px;
+  height: 26px;
+  border-radius: 999px;
+  background: linear-gradient(to top, rgba(245, 238, 225, 0) 0%, rgba(245, 238, 225, 0.55) 70%);
+  opacity: 0;
+  animation: steam-rise 2.6s ease-in-out infinite;
+}
+.food-steam span:nth-child(1) { transform: translateX(-16px); animation-delay: 0s; }
+.food-steam span:nth-child(2) { transform: translateX(-2px); animation-delay: 0.5s; height: 32px; }
+.food-steam span:nth-child(3) { transform: translateX(12px); animation-delay: 1s; }
+
+/* Ice cubes drifting for cold drinks. Cream cubes with a bright cream
+   edge so they read on the charcoal plates (strict tri-color: the old
+   cool blue tint is gone). */
+.food-ice {
+  position: absolute;
+  top: 16px;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+.food-ice span {
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: rgba(245, 238, 225, 0.85);
+  box-shadow: inset 0 0 0 1.5px rgba(245, 238, 225, 0.9), 0 1px 2px rgba(38, 38, 43, 0.35);
+  animation: ice-bob 3s ease-in-out infinite;
+}
+.food-ice span:nth-child(1) { left: 30%; top: 0; }
+.food-ice span:nth-child(2) { left: 55%; top: 8px; animation-delay: 0.8s; }
+.food-ice span:nth-child(3) { left: 42%; top: 18px; animation-delay: 1.4s; }
+
+@keyframes steam-rise {
+  0% { opacity: 0; transform: translateY(8px) scale(0.8); }
+  35% { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(-22px) scale(1.15); }
+}
+@keyframes ice-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.55; }
+  50% { transform: translateY(-5px) rotate(8deg); opacity: 0.9; }
+}
+/* Sold-out cards desaturate the plate too, not just the emoji. */
+.food-card.is-out .food-plate { filter: grayscale(0.7); opacity: 0.6; }
+
+/* ---------- Motion: card + view entrance ---------- */
+.card {
+  animation: card-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.grid .card:nth-child(1) { animation-delay: 0.03s; }
+.grid .card:nth-child(2) { animation-delay: 0.06s; }
+.grid .card:nth-child(3) { animation-delay: 0.09s; }
+.grid .card:nth-child(4) { animation-delay: 0.12s; }
+.grid .card:nth-child(5) { animation-delay: 0.15s; }
+.grid .card:nth-child(6) { animation-delay: 0.18s; }
+.grid .card:nth-child(7) { animation-delay: 0.21s; }
+.grid .card:nth-child(8) { animation-delay: 0.24s; }
+.grid .card:nth-child(9) { animation-delay: 0.27s; }
+.grid .card:nth-child(10) { animation-delay: 0.30s; }
+.grid .card:nth-child(n+11) { animation-delay: 0.33s; }
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+/* Card hover lift + subtle pointer tilt (--tilt-x/--tilt-y set by FoodCard.jsx). */
+.food-card { transition: box-shadow 0.25s ease, transform 0.3s ease; }
+.food-card:hover {
+  box-shadow: 0 14px 30px rgba(38, 38, 43, 0.25);
+  transform: perspective(900px) translateY(-3px)
+    rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+}
+
+/* Cart badge pops when the count grows. */
+.cart-badge { animation: badge-pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes badge-pop {
+  0% { transform: scale(0.3); opacity: 0; }
+  60% { transform: scale(1.3); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Modal springs in. */
+.modal { animation: modal-in 0.32s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.92) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Generic pop-in used by the order-confirmed card. */
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Confetti canvas sits inside the order-confirmed card. */
+.order-confirmed canvas { width: 100%; }
+
+/* ---------- Transaction / receipt card (post-order confirmation) ----------
+   The paper receipt the client lands on right after placing an order: a
+   perforated-edge card with dashed rules, a two-column body (details +
+   items on the left, totals on the right), and a brand footer. Tri-color
+   only; reuses .order-block-label / .status-stamp for consistency. */
+.receipt-card {
+  border: 2px dashed var(--border);
+  padding: 28px;
+}
+/* Perforated receipt edge: two notches sitting on the card's top rule. */
+.receipt-notches {
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 30px;
+  z-index: 2;
+}
+.receipt-notches span {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cream);
+  border: 2px dashed var(--border);
+}
+/* Two-column body: details+items on the left, totals on the right. */
+.receipt-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+.receipt-col { display: grid; gap: 12px; align-content: start; }
+.receipt-lines { display: grid; gap: 9px; }
+.receipt-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.receipt-line .muted { color: var(--muted); }
+.receipt-line span:last-child { text-align: right; }
+/* The emphasized grand-total row: a solid rule + display font, receipt-style. */
+.receipt-total {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--ink);
+  padding-top: 10px;
+  border-top: 1.5px solid var(--border);
+}
+.receipt-total span:last-child { font-family: var(--font-display); font-size: 18px; }
+@media (max-width: 620px) {
+  .receipt-card { padding: 22px 18px; }
+  .receipt-notches { padding: 0 18px; }
+  .receipt-grid { grid-template-columns: 1fr; gap: 22px; }
+}
+
+/* Respect users who prefer less motion: strip decorative animation. */
+@media (prefers-reduced-motion: reduce) {
+  .card, .food-plate-item, .food-steam span, .food-ice span,
+  .brand-logo .steam, .cart-badge, .modal {
+    animation: none !important;
+  }
+  .food-card, .food-plate-item { transition: none !important; }
+}
+
+/* ---------- View transition (page swap) ---------- */
+.view-transition {
+  animation: view-in 0.3s ease both;
+}
+@keyframes view-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .view-transition { animation: none; }
+}
+
+/* ---------- Scroll-in reveal ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+  will-change: opacity, transform;
+}
+.reveal-shown {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+
