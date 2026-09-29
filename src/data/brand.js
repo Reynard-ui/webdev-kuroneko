@@ -3,15 +3,6 @@
 // from a CMS or backend. Kept in data/ so the UI sections stay data-bound.
 
 // The restaurant story, shown in "The Story of Kuro Neko" (customer home).
-export const STORY = {
-  eyebrow: '物語',
-  title: 'The Story of Kuro Neko',
-  paragraphs: [
-    'Kuro Neko began with a black cat that wandered into our first kitchen in 1987 — Kuro, the original mascot. He would sit on the prep counter, watching the chefs, and leave one of his whisker-length fur tufts on every plate that was not finished to his standards.',
-    'Every dish we serve today still carries that watch. Fresh fish cut to order, broth that simmers for hours, and a kitchen that refuses to rush. Kuro still visits — ask your server where he is sitting.',
-  ],
-  kanji: '物語',
-}
 
 // "Find the cat" / branches: restyled location cards. Purely data-driven.
 export const BRANCHES = [
