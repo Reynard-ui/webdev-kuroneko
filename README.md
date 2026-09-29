@@ -244,3 +244,10 @@ match the new name.
   restaurant identity
 - Motion is restrained and respects the user's `prefers-reduced-motion`
   setting (reveals, confetti, and card animations all disable)
+
+## Demo Notes
+
+- KURO NEKO is designed as a front-end demonstration project, so payment and authentication are simulated.
+- Data stored in localStorage is specific to the browser/device being used.
+- Orders created during a session are temporary and will reset when the page is refreshed.
+- The administrator interface is intended to demonstrate restaurant-side order and menu management.
