@@ -281,6 +281,7 @@ and user-created data (signups, sessions, display names) is stored in the browse
 - Receive a receipt confirmation for every placed order
 - View order history and live order status
 - Edit display name and manage the profile
+- Receive a receipt confirmation for every placed order
 
 ### Administrator
 
